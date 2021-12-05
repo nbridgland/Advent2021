@@ -22,11 +22,6 @@ class BingoBoard:
             return True
         if (self.marked_grid.sum(axis=0) == 5).any():
             return True
-        diag_entries = 0
-        for k in range(5):
-            diag_entries += self.marked_grid[k][k]
-        if diag_entries == 5:
-            return True
         return False
 
 # Part 1
