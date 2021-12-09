@@ -27,25 +27,21 @@ def build_hash_table(input_entry):
             output[7] = entry
         if len(entry) == 7:
             output[entry] = 8
-    output[6] = []
-    output[5] = []
     for entry in input_entry:
         if len(entry) == 6:
-            output[6].append(entry)
             if check_overlap(entry, output[1]) != 2:
-                output[entry] = 6
+                output[''.join(sorted(entry))] = 6
             elif check_overlap(entry, output[4]) == 4:
-                output[entry] = 9
+                output[''.join(sorted(entry))] = 9
             else:
-                output[entry] = 0
+                output[''.join(sorted(entry))] = 0
         if len(entry) == 5:
-            output[5].append(entry)
             if check_overlap(entry, output[1]) == 2:
-                output[entry] = 3
+                output[''.join(sorted(entry))] = 3
             elif check_overlap(entry, output[4]) == 3:
-                output[entry] = 5
+                output[''.join(sorted(entry))] = 5
             else:
-                output[entry] = 2
+                output[''.join(sorted(entry))] = 2
     return output
 
 def check_overlap(string_1, string_2):
@@ -71,8 +67,6 @@ for k in range(len(inputs)):
         elif len(entry) == 7:
             part_2_sum += 8*10**power
         else:
-            for key in hash_info[len(entry)]:
-                if check_overlap(entry, key) == len(entry):
-                    part_2_sum += hash_info[key]*10**power
+            part_2_sum += hash_info[''.join(sorted(entry))]*10**power
         power -= 1
 print("Part 2: ", part_2_sum)
