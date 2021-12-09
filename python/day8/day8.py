@@ -44,6 +44,7 @@ def build_hash_table(input_entry):
                 output[''.join(sorted(entry))] = 2
     return output
 
+
 def check_overlap(string_1, string_2):
     count_common = 0
     for char1 in string_1:
@@ -52,8 +53,8 @@ def check_overlap(string_1, string_2):
                 count_common += 1
     return count_common
 
+
 part_2_sum = 0
-num_reference = list(range(10))
 for k in range(len(inputs)):
     hash_info = build_hash_table(inputs[k])
     power = len(outputs[k])-1
