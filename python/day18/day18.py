@@ -1,17 +1,34 @@
 import ast
 import numpy as np
 
-with open('testinput.txt') as f:
+with open('input.txt') as f:
     data = f.read().split('\n')
     data = [ast.literal_eval(entry) for entry in data]
 
 
+def parse_number_list(snail_fish_entry, path = ''):
+    if type(snail_fish_entry) == list:
+        output = []
+        output = output + parse_number_list(snail_fish_entry[0], path=path + 'l')
+        output = output + parse_number_list(snail_fish_entry[1], path=path + 'r')
+    else:
+        output = [{'value': snail_fish_entry, 'path': path}]
+    return output
+
+
 class SnailFishNumber:
     def __init__(self, snail_list):
-        self.number = snail_list
+        self.number = parse_number_list(snail_list)
 
-    def add(self, number):
-        self.number = [self.number, number]
+    @staticmethod
+    def increase_depth(number, direction):
+        for item in number:
+            item['path'] = direction + item['path']
+        return number
+
+    def add(self, add_number):
+        add_snail_fish_number = parse_number_list(add_number)
+        self.number = SnailFishNumber.increase_depth(self.number, 'l') + SnailFishNumber.increase_depth(add_snail_fish_number, 'r')
         self.reduce()
 
     def reduce(self):
@@ -26,112 +43,37 @@ class SnailFishNumber:
             new = self.number.copy()
 
     def explode(self):
-        for entry in self.number:
-            if type(entry) is list:
-                for entry1 in entry:
-                    if type(entry1) is list:
-                        for entry2 in entry1:
-                            if type(entry2) is list:
-                                for entry3 in entry2:
-                                    if type(entry3) is list:
-                                        leftindex = entry2.index(entry3) - 1
-                                        if leftindex >= 0:
-                                            entry2[leftindex] += entry3[0]
-                                        elif entry1.index(entry2) > 0:
-                                            if type(entry1[entry1.index(entry2)-1]) == list:
-                                                entry1[entry1.index(entry2)-1][-1] += entry3[0]
-                                            else:
-                                                entry1[entry1.index(entry2)-1] += entry3[0]
-                                        elif entry.index(entry1) > 0:
-                                            if type(entry[entry.index(entry1)-1]) == list:
-                                                if type(entry[entry.index(entry1)-1][-1]) == list:
-                                                    entry[entry.index(entry1) -1][-1][-1] += entry3[0]
-                                                else:
-                                                    entry[entry.index(entry1)-1][-1] += entry3[0]
-                                            else:
-                                                entry[entry.index(entry1)-1] += entry3[0]
-                                        elif self.number.index(entry) > 0:
-                                            if type(self.number[self.number.index(entry) - 1]) == list:
-                                                if type(self.number[self.number.index(entry) - 1][-1]) == list:
-                                                    if type(self.number[self.number.index(entry) - 1][-1][-1]) == list:
-                                                        self.number[self.number.index(entry) - 1][-1][-1][-1] += entry3[0]
-                                                    else:
-                                                        self.number[self.number.index(entry) - 1][-1][-1] += entry3[0]
-                                                else:
-                                                    self.number[self.number.index(entry)-1][-1] += entry3[0]
-                                            else:
-                                                self.number[self.number.index(entry) -1] += entry3[0]
-                                        rightindex = leftindex + 2
-                                        if len(entry2) > rightindex:
-                                            if type(entry2[rightindex]) == list:
-                                                entry2[rightindex][0] += entry3[1]
-                                            else:
-                                                entry2[rightindex] += entry3[1]
-                                        elif len(entry1) > entry1.index(entry2) + 1:
-                                            if type(entry1[entry1.index(entry2) + 1]) == list:
-                                                if type(entry1[entry1.index(entry2)+1][0]) == list:
-                                                    entry1[entry1.index(entry2) + 1][0][0] += entry3[1]
-                                                else:
-                                                    entry1[entry1.index(entry2) + 1][0] += entry3[1]
-                                            else:
-                                                entry1[entry1.index(entry2) + 1] += entry3[1]
-                                        elif len(entry) > entry.index(entry1) + 1:
-                                            if type(entry[entry.index(entry1) + 1]) == list:
-                                                if type(entry[entry.index(entry1) + 1][0]) == list:
-                                                    if type(entry[entry.index(entry1)+1][0][0]) == list:
-                                                        entry[entry.index(entry1) + 1][0][0][0] += entry3[1]
-                                                    else:
-                                                        entry[entry.index(entry1) + 1][0][0] += entry3[1]
-                                                else:
-                                                    entry[entry.index(entry1)+1][0] += entry3[1]
-                                            else:
-                                                entry[entry.index(entry1)+1] += entry3[1]
-                                        elif len(self.number) > self.number.index(entry) + 1:
-                                            if type(self.number[self.number.index(entry) + 1]) == list:
-                                                if type(self.number[self.number.index(entry) + 1][0]) == list:
-                                                    if type(self.number[self.number.index(entry) + 1][0][0]) == list:
-                                                        if type(self.number[self.number.index(entry) + 1][0][0][0]) == list:
-                                                            self.number[self.number.index(entry) + 1][0][0][0][0] += entry3[1]
-                                                        else:
-                                                            self.number[self.number.index(entry) + 1][0][0][0] += entry3[1]
-                                                    else:
-                                                        self.number[self.number.index(entry) + 1][0][0] += entry3[1]
-                                                else:
-                                                    self.number[self.number.index(entry) + 1][0] += entry3[1]
-                                            else:
-                                                self.number[self.number.index(entry) + 1] += entry3[1]
-                                        entry2[leftindex+1] = 0
-
-    @staticmethod
-    def split_number(number):
-        if type(number) is list:
-            entry0, is_split = SnailFishNumber.split_number(number[0])
-            if is_split:
-                return [entry0, number[1]], True
-            else:
-                entry1, is_split = SnailFishNumber.split_number(number[1])
-                return [entry0, entry1], is_split
-        else:
-            if number >= 10:
-                return [int(np.floor(number/2)), int(np.ceil(number/2))], True
-            else:
-                return number, False
+        k = 0
+        while k < len(self.number):
+            if len(self.number[k]['path']) > 4:
+                # should be first of pair that's too deep:
+                if k > 0:
+                    self.number[k-1]['value'] += self.number[k]['value']
+                if len(self.number) > k + 2:
+                    self.number[k+2]['value'] += self.number[k+1]['value']
+                self.number = self.number[:k] + [{'value': 0, 'path': self.number[k]['path'][:-1]}] + self.number[k+2:]
+            k += 1
 
     def split(self):
-        self.number = self.split_number(self.number)[0]
-
-    @staticmethod
-    def get_magnitude(number):
-        if type(number) == int:
-            return number
-        else:
-            return 3*SnailFishNumber.get_magnitude(number[0]) + 2*SnailFishNumber.get_magnitude(number[1])
+        for k in range(len(self.number)):
+            if self.number[k]['value'] >= 10:
+                old_value = self.number[k]
+                new_pair = [{'value': int(np.floor(old_value['value'] / 2)), 'path': old_value['path'] + 'l'},
+                            {'value': int(np.ceil(old_value['value'] / 2)), 'path': old_value['path'] + 'r'}]
+                self.number = self.number[:k] + new_pair + self.number[k+1:]
+                break
 
     def magnitude(self):
-        return self.get_magnitude(self.number)
-
-
-
+        output = 0
+        for item in self.number:
+            value = item['value']
+            for char in item['path']:
+                if char == 'l':
+                    value *= 3
+                else:
+                    value *= 2
+            output += value
+        return output
 
 test = SnailFishNumber([[[[4,3],4],4],[7,[[8,4],9]]])
 test.add([1,1])
@@ -141,17 +83,13 @@ part1 = SnailFishNumber(data[0])
 for entry in data[1:]:
     part1.add(entry)
     print("Plus ", entry, " equals ", part1.number)
-print("Part 1:", part1.magnitude())
+
+print("Part1 value: ", part1.number)
+print("Part 1: ", part1.magnitude())
 
 #Part 2
 max_magnitude = 0
-print(len(data))
-k = 0
-j = 0
-
 for entry in data:
-    print(k)
-    k+=1
     for entry1 in data:
         sum1 = SnailFishNumber(entry)
         sum2 = SnailFishNumber(entry1)
@@ -165,4 +103,3 @@ for entry in data:
             max_magnitude = sum2mag
 
 print("Part 2: ", max_magnitude)
-
